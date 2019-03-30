@@ -114,8 +114,9 @@ class CavePopulator extends AmountPopulator {
 	 * @param int $height
 	 * @param int $depth
 	 * @param Random $random
+	 *
 	 * @yield Vector3
-	 * @return void
+	 * @return \Generator|null
 	 */
 	public function generateBranch($x, $y, $z, $length, $height, $depth, Random $random) {
 		if (! (yield new Vector3($x, $y, $z))) {

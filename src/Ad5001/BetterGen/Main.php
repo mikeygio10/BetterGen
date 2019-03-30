@@ -64,26 +64,11 @@ class Main extends PluginBase implements Listener {
 	 */
 	public function onEnable() {
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-		Generator::addGenerator(BetterNormal::class, "betternormal");
-		if ($this->isOtherNS()) $this->getLogger()->warning("Tesseract detected. Note that Tesseract is not up to date with the generation structure and some generation features may be limited or not working");
+		GeneratorManager::addGenerator(BetterNormal::class, "betternormal");
 		@mkdir(LootTable::getPluginFolder());
 		@mkdir(LootTable::getPluginFolder() . "loots");
 		if (!file_exists(LootTable::getPluginFolder() . "processingLoots.json"))
 			file_put_contents(LootTable::getPluginFolder() . "processingLoots.json", "{}");
-	}
-
-	
-	/**
-	 * Checks for tesseract like namespaces. Returns true if thats the case
-	 *
-	 * @return boolean
-	 */
-	public static function isOtherNS() {
-		try {
-			return @class_exists("pocketmine\\level\\generator\\normal\\object\\OakTree");
-		} catch (\Exception $e) {
-			return false;
-		}
 	}
 
 	/**

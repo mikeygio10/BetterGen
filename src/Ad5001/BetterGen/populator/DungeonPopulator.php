@@ -17,12 +17,10 @@
 
 namespace Ad5001\BetterGen\populator;
 
-use Ad5001\BetterGen\utils\BuildingUtils;
 use Ad5001\BetterGen\structure\Dungeons;
 use pocketmine\block\Block;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
-use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
 class DungeonPopulator extends AmountPopulator {
@@ -49,11 +47,14 @@ class DungeonPopulator extends AmountPopulator {
 			$d->placeObject($level, $x, $y, $z, $random);
 		}
 	}
-	
+
 	/**
 	 * Gets the top block (y) on an x and z axes
+	 *
 	 * @param int $x
 	 * @param int $z
+	 *
+	 * @return int
 	 */
 	protected function getHighestWorkableBlock($x, $z) {
 		for($y = Level::Y_MAX - 1; $y > 0; -- $y) {

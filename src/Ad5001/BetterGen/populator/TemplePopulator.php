@@ -47,11 +47,14 @@ class TemplePopulator extends AmountPopulator {
 		if ($temple->canPlaceObject($level, $x, $y, $z, $random))
 			$temple->placeObject($level, $x, $y - 1, $z, $random);
 	}
-	
+
 	/**
 	 * Gets the top block (y) on an x and z axes
+	 *
 	 * @param int $x
 	 * @param int $z
+	 *
+	 * @return int
 	 */
 	protected function getHighestWorkableBlock($x, $z) {
 		for($y = Level::Y_MAX - 1; $y > 0; -- $y) {

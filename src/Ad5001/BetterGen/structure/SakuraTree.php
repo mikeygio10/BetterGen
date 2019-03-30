@@ -17,18 +17,13 @@
 
 namespace Ad5001\BetterGen\structure;
 
-use Ad5001\BetterGen\Main;
 use pocketmine\block\Block;
 use pocketmine\block\Wood;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\generator\object\Tree;
 use pocketmine\utils\Random;
 
-if (Main::isOtherNS()) {
-	class_alias("pocketmine\\level\\generator\\normal\\object\\Tree", "Ad5001\\BetterGen\\structure\\Tree");
-} else {
-	class_alias("pocketmine\\level\\generator\\object\\Tree", "Ad5001\\BetterGen\\structure\\Tree");
-}
+class_alias("pocketmine\\level\\generator\\object\\Tree", "Ad5001\\BetterGen\\structure\\Tree");
 
 class SakuraTree extends Tree {
 	const TRUNK_POS = [  // Checks for trees trunks. Not automatically generated but there is no point of making more or less

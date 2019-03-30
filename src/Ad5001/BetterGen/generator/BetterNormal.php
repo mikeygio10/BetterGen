@@ -24,12 +24,11 @@ use Ad5001\BetterGen\biome\BetterMesa;
 use Ad5001\BetterGen\biome\BetterMesaPlains;
 use Ad5001\BetterGen\biome\BetterRiver;
 use Ad5001\BetterGen\biome\Mountainable;
-use Ad5001\BetterGen\Main;
 use Ad5001\BetterGen\populator\CavePopulator;
+use Ad5001\BetterGen\populator\DungeonPopulator;
 use Ad5001\BetterGen\populator\FloatingIslandPopulator;
 use Ad5001\BetterGen\populator\MineshaftPopulator;
 use Ad5001\BetterGen\populator\RavinePopulator;
-use Ad5001\BetterGen\populator\DungeonPopulator;
 use pocketmine\block\Block;
 use pocketmine\block\CoalOre;
 use pocketmine\block\DiamondOre;
@@ -43,7 +42,6 @@ use pocketmine\level\ChunkManager;
 use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\generator\noise\Simplex;
-use pocketmine\level\generator\normal\object\OreType as OreType2;
 use pocketmine\level\generator\object\OreType;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
@@ -172,8 +170,8 @@ class BetterNormal extends Generator {
 		}
 		
 		$this->selector->recalculate ();
-		
-		$cover = Main::isOtherNS() ? new \pocketmine\level\generator\normal\populator\GroundCover() : new \pocketmine\level\generator\populator\GroundCover();
+
+		$cover = new \pocketmine\level\generator\populator\GroundCover();
 		$this->generationPopulators[] = $cover;
 		
 		if(!\Ad5001\BetterGen\utils\CommonUtils::in_arrayi("Lakes", self::$options["delStruct"])) {
@@ -219,26 +217,8 @@ class BetterNormal extends Generator {
 		}
 
 		if(!\Ad5001\BetterGen\utils\CommonUtils::in_arrayi("Ores", self::$options["delStruct"])) {
-			$ores = Main::isOtherNS() ? new \pocketmine\level\generator\normal\populator\Ore() : new \pocketmine\level\generator\populator\Ore();
-			if(Main::isOtherNS()) $ores->setOreTypes([ 
-					new OreType2(new CoalOre (), 20, 16, 0, 128),
-					new OreType2(new IronOre (), 20, 8, 0, 64),
-					new OreType2(new RedstoneOre (), 8, 7, 0, 16),
-					new OreType2(new LapisOre (), 1, 6, 0, 32),
-					new OreType2(new GoldOre (), 2, 8, 0, 32),
-					new OreType2(new DiamondOre (), 1, 7, 0, 16),
-					new OreType2(new Dirt (), 20, 32, 0, 128),
-					new OreType2(new Gravel (), 10, 16, 0, 128) 
-			]);
-			if(!Main::isOtherNS()) $ores->setOreTypes([ 
-					new OreType(new CoalOre (), 20, 16, 0, 128),
-					new OreType(new IronOre (), 20, 8, 0, 64),
-					new OreType(new RedstoneOre (), 8, 7, 0, 16),
-					new OreType(new LapisOre (), 1, 6, 0, 32),
-					new OreType(new GoldOre (), 2, 8, 0, 32),
-					new OreType(new DiamondOre (), 1, 7, 0, 16),
-					new OreType(new Dirt (), 20, 32, 0, 128),
-					new OreType(new Gravel (), 10, 16, 0, 128) 
+			$ores = new \pocketmine\level\generator\populator\Ore();
+			$ores->setOreTypes([new OreType(new CoalOre (), 20, 16, 0, 128), new OreType(new IronOre (), 20, 8, 0, 64), new OreType(new RedstoneOre (), 8, 7, 0, 16), new OreType(new LapisOre (), 1, 6, 0, 32), new OreType(new GoldOre (), 2, 8, 0, 32), new OreType(new DiamondOre (), 1, 7, 0, 16), new OreType(new Dirt (), 20, 32, 0, 128), new OreType(new Gravel (), 10, 16, 0, 128)
 			]);
 			$this->populators[] = $ores;
 		}
