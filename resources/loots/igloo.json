@@ -1,0 +1,12 @@
+{
+  "max": 27,
+  "torch": {
+    "percentage": 66,
+    "minCount": 1,
+    "maxCount": 16,
+    "minStacks": 3,
+    "maxStacks": 3,
+    "id": 50,
+    "data": 0
+  }
+}

@@ -92,6 +92,6 @@ class Dungeons extends PopulatorObject {
 			}
 		}
 		// Setting the spawner
-		$level->setBlockIdAt($x, $y + 1, $z, Block::MOB_SPAWNER);
+		$level->setBlockIdAt($x + 5, $y + 2, $z + 5, Block::MOB_SPAWNER);
 	}
 }

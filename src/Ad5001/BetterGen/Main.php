@@ -25,16 +25,14 @@ use pocketmine\block\Block;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
-use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\level\ChunkLoadEvent;
 use pocketmine\event\level\ChunkPopulateEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\level\generator\biome\Biome;
-use pocketmine\level\generator\Generator;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\ListTag;
-use pocketmine\nbt\tag\StringTag;
+use pocketmine\level\biome\Biome;
+use pocketmine\level\generator\GeneratorManager;
+use pocketmine\level\Level;
+use pocketmine\level\Position;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Chest;
@@ -58,17 +56,18 @@ class Main extends PluginBase implements Listener {
 	}
 
 	/**
-	 * Called when the plugin enales
+	 * Called when the plugin enables
 	 *
 	 * @return void
 	 */
 	public function onEnable() {
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		GeneratorManager::addGenerator(BetterNormal::class, "betternormal");
-		@mkdir(LootTable::getPluginFolder());
-		@mkdir(LootTable::getPluginFolder() . "loots");
-		if (!file_exists(LootTable::getPluginFolder() . "processingLoots.json"))
-			file_put_contents(LootTable::getPluginFolder() . "processingLoots.json", "{}");
+		@mkdir($this->getDataFolder()."loots");
+		$this->saveResource("loots/igloo.json");
+		$this->saveResource("loots/mineshaft.json");
+		$this->saveResource("loots/temple.json");
+		$this->saveResource("processingLoots.json");
 	}
 
 	/**
@@ -89,15 +88,15 @@ class Main extends PluginBase implements Listener {
 						break;
 					case 1 : // /createworld <name>
 						$name = $args[0];
-						$generator = Generator::getGenerator("betternormal");
+						$generator = GeneratorManager::getGenerator("betternormal");
 						$generatorName = "betternormal";
 						$seed = $this->generateRandomSeed();
 						$options = [];
 						break;
 					case 2 : // /createworld <name> [generator = betternormal]
 						$name = $args[0];
-						$generator = Generator::getGenerator($args[1]);
-						if (Generator::getGeneratorName($generator) !== strtolower($args[1])) {
+						$generator = GeneratorManager::getGenerator($args[1]);
+						if(GeneratorManager::getGeneratorName($generator) !== strtolower($args[1])) {
 							$sender->sendMessage(self::PREFIX . "§4Could not find generator {$args[1]}. Are you sure it is registered?");
 							return true;
 						}
@@ -107,8 +106,8 @@ class Main extends PluginBase implements Listener {
 						break;
 					case 3 : // /createworld <name> [generator = betternormal] [seed = rand()]
 						$name = $args[0];
-						$generator = Generator::getGenerator($args[1]);
-						if (Generator::getGeneratorName($generator) !== strtolower($args[1])) {
+						$generator = GeneratorManager::getGenerator($args[1]);
+						if(GeneratorManager::getGeneratorName($generator) !== strtolower($args[1])) {
 							$sender->sendMessage(self::PREFIX . "§4Could not find generator {$args[1]}. Are you sure it is registered?");
 							return true;
 						}
@@ -124,8 +123,8 @@ class Main extends PluginBase implements Listener {
 						break;
 					default : // /createworld <name> [generator = betternormal] [seed = rand()] [options(json)]
 						$name = $args[0];
-						$generator = Generator::getGenerator($args[1]);
-						if (Generator::getGeneratorName($generator) !== strtolower($args[1])) {
+						$generator = GeneratorManager::getGenerator($args[1]);
+						if(GeneratorManager::getGeneratorName($generator) !== strtolower($args[1])) {
 							$sender->sendMessage(self::PREFIX . "§4Could not find generator {$args[1]}. Are you sure it is registered?");
 							return true;
 						}
@@ -156,6 +155,9 @@ class Main extends PluginBase implements Listener {
 				return true;
 				break;
 			case "worldtp":
+				if(!$sender instanceof Player) {
+					return false;
+				}
 				if(isset($args[0])) {
 					if(is_null($this->getServer()->getLevelByName($args[0]))) {
 						$this->getServer()->loadLevel($args[0]);
@@ -164,13 +166,13 @@ class Main extends PluginBase implements Listener {
 							return false;
 						}
 					}
-					$sender->teleport(\pocketmine\level\Position::fromObject($sender, $this->getServer()->getLevelByName($args[0])));
+					$sender->teleport(Position::fromObject($sender, $this->getServer()->getLevelByName($args[0])));
 					$sender->sendMessage("§aTeleporting to {$args[0]}...");
 					return true;
 				} else {
 					return false;
 				}
-				break;
+			break;
 			case 'temple':{
 				if($sender instanceof ConsoleCommandSender) return false;
 				/** @var Player $sender */
@@ -208,7 +210,6 @@ class Main extends PluginBase implements Listener {
 		return BetterForest::registerForest($name, $treeClass, $infos);
 	}
 
-
 	/**
 	 * Checks when a chunk populates to populate chests back
 	 *
@@ -228,50 +229,25 @@ class Main extends PluginBase implements Listener {
 		}
 	}
 
-
 	/**
-	 * Checks when a player touches an ungenerated chest to generate it.
+	 * Loads chest tiles on chest blocks when a chunk is loaded
 	 *
-	 * @param PlayerInteractEvent $event
-	 * @return void
+	 * @param ChunkLoadEvent $event
 	 */
-	public function onInteract(PlayerInteractEvent $event) {
-		$cfg = new Config(LootTable::getPluginFolder() . "processingLoots.json", Config::JSON);
-		if ($event->getBlock()->getId() !== Block::CHEST) return;
-		if (!$cfg->exists($event->getBlock()->getX() . ";" . $event->getBlock()->getY() . ";" . $event->getBlock()->getZ())) return;
-		$nbt = new CompoundTag("", [
-			new ListTag("Items", []),
-			new StringTag("id", Tile::CHEST),
-			new IntTag("x", $event->getBlock()->x),
-			new IntTag("y", $event->getBlock()->y),
-			new IntTag("z", $event->getBlock()->z)
-		]);
-		/** @var Chest $chest */
-		$chest = Tile::createTile(Tile::CHEST, $event->getBlock()->getLevel(), $nbt);
-		$chest->setName("§k(Fake)§r Minecart chest");
-		LootTable::fillChest($chest->getInventory(), $event->getBlock());
-	}
-
-	/**
-	 * Checks when a players breaks an ungenerated chest to generate it.
-	 *
-	 * @param BlockBreakEvent $event
-	 * @return void
-	 */
-	public function onBlockBreak(BlockBreakEvent $event) {
-		$cfg = new Config(LootTable::getPluginFolder() . "processingLoots.json", Config::JSON);
-		if ($event->getBlock()->getId() !== Block::CHEST) return;
-		if (!$cfg->exists($event->getBlock()->getX() . ";" . $event->getBlock()->getY() . ";" . $event->getBlock()->getZ())) return;
-		$nbt = new CompoundTag("", [
-			new ListTag("Items", []),
-			new StringTag("id", Tile::CHEST),
-			new IntTag("x", $event->getBlock()->x),
-			new IntTag("y", $event->getBlock()->y),
-			new IntTag("z", $event->getBlock()->z)
-		]);
-		/** @var Chest $chest */
-		$chest = Tile::createTile(Tile::CHEST, $event->getBlock()->getLevel(), $nbt);
-		$chest->setName("§k(Fake)§r Minecart chest");
-		LootTable::fillChest($chest->getInventory(), $event->getBlock());
+	public function onChunkLoad(ChunkLoadEvent $event) {
+		if($event->getLevel()->getProvider()->getGenerator() === "betternormal") {
+			$chunk = $event->getChunk();
+			for($x = 0; $x < 16; $x++) {
+				for($z = 0; $z < 16; $z++) {
+					for($y = 0; $y <= Level::Y_MAX; $y++) {
+						$id = $chunk->getBlockId($x, $y, $z);
+						$tile = $chunk->getTile($x, $y, $z);
+						if($id === Block::CHEST and $tile === null) {
+							Tile::createTile(Tile::CHEST, $event->getLevel(), Chest::createNBT($pos = new Vector3($chunk->getX() * 16 + $x, $y, $chunk->getZ() * 16 + $z), null)); //TODO: set face correctly
+						}
+					}
+				}
+			}
+		}
 	}
 }

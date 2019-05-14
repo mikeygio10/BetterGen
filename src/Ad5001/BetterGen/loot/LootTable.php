@@ -20,7 +20,7 @@ namespace Ad5001\BetterGen\loot;
 use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\NBT;
+use pocketmine\nbt\JsonNbtParser;
 use pocketmine\utils\Config;
 use pocketmine\utils\Random;
 
@@ -68,8 +68,8 @@ class LootTable {
 	public static function buildLootTable(Vector3 $place, int $type, Random $random) {
 		if($place->y < 1) return; // Making sure sometimes that it doesn't write for nothing
 		$cfg = new Config(self::getPluginFolder() . "processingLoots.json", Config::JSON);
-		$lootsFromJson = json_decode(file_get_contents(self::getResourcesFolder() . "loots/" . self::LOOT_NAMES[$type] . ".json"), true);
-		$loots =[];
+		$lootsFromJson = json_decode(file_get_contents(self::getResourcesFolder()."loots".DIRECTORY_SEPARATOR.self::LOOT_NAMES[$type].".json"), true);
+		$loots = [];
 		foreach($lootsFromJson as $loot) {
 			if(is_array($loot) && $random->nextBoundedInt(101) < $loot["percentage"])
 				$loots[] = $loot;
