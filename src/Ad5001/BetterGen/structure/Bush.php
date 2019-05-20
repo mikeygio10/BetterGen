@@ -24,11 +24,7 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
 class Bush extends PopulatorObject {
-	public $overridable = [
-			Block::AIR => true,
-			17 => true,
-			Block::SNOW_LAYER => true,
-			Block::LOG2 => true 
+	public $overridable = [Block::AIR => true, 17 => true, Block::SNOW_LAYER => true, Block::LOG2 => true
 	];
 	/** @var int[] */
 	protected $leaf;
@@ -42,9 +38,7 @@ class Bush extends PopulatorObject {
 	 * @param int $leafData
 	 */
 	public function __construct($leafId = Block::LEAVES, $leafData = 0) {
-		$this->leaf = [ 
-				$leafId,
-				$leafData 
+		$this->leaf = [$leafId, $leafData
 		];
 	}
 	

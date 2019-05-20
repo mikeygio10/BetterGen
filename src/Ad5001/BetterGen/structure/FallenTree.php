@@ -22,22 +22,13 @@ use pocketmine\block\Block;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\generator\object\PopulatorObject;
 use pocketmine\level\generator\object\Tree as ObjectTree;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
 
 class FallenTree extends PopulatorObject {
-	public static $overridable = [ 
-			Block::AIR => true,
-			6 => true,
-			17 => true,
-			18 => true,
-			Block::DANDELION => true,
-			Block::POPPY => true,
-			Block::SNOW_LAYER => true,
-			Block::LOG2 => true,
-			Block::LEAVES2 => true,
-			Block::CACTUS => true];
+	public static $overridable = [Block::AIR => true, 6 => true, 17 => true, 18 => true, Block::DANDELION => true, Block::POPPY => true, Block::SNOW_LAYER => true, Block::LOG2 => true, Block::LEAVES2 => true, Block::CACTUS => true];
 	/** @var Tree */
 	protected $tree;
 	/** @var int */

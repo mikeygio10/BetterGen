@@ -45,9 +45,9 @@ class BuildingUtils {
 		if($block == null) $block = Block::get(Block::AIR);
 		list($pos1, $pos2) = self::minmax($pos1, $pos2);
 		for($x = $pos1->x; $x >= $pos2->x; $x--) for($y = $pos1->y; $y >= $pos2->y; $y--) for($z = $pos1->z; $z >= $pos2->z; $z--) {
-					$level->setBlockIdAt($x, $y, $z, $block->getId());
-					$level->setBlockDataAt($x, $y, $z, $block->getDamage());
-				}
+			$level->setBlockIdAt($x, $y, $z, $block->getId());
+			$level->setBlockDataAt($x, $y, $z, $block->getDamage());
+		}
 	}
 	
 	
@@ -66,9 +66,9 @@ class BuildingUtils {
 		if($block == null) $block = Block::get(Block::AIR);
 		list($pos1, $pos2) = self::minmax($pos1, $pos2);
 		for($x = $pos1->x; $x >= $pos2->x; $x--) for($y = $pos1->y; $y >= $pos2->y; $y--) for($z = $pos1->z; $z >= $pos2->z; $z--) if($random !== null ? $random->nextBoundedInt($randMax) == 0 : rand(0, $randMax) == 0) {
-					$level->setBlockIdAt($x, $y, $z, $block->getId());
-					$level->setBlockDataAt($x, $y, $z, $block->getDamage());
-				}
+			$level->setBlockIdAt($x, $y, $z, $block->getId());
+			$level->setBlockDataAt($x, $y, $z, $block->getDamage());
+		}
 	}
 	
 	/**
@@ -213,9 +213,7 @@ class BuildingUtils {
 	public static function minmax(Vector3 $pos1, Vector3 $pos2): array {
 		$v1 = new Vector3(max($pos1->x, $pos2->x), max($pos1->y, $pos2->y), max($pos1->z, $pos2->z));
 		$v2 = new Vector3(min($pos1->x, $pos2->x), min($pos1->y, $pos2->y), min($pos1->z, $pos2->z));
-		return [ 
-				$v1,
-				$v2 
+		return [$v1, $v2
 		];
 	}
 }

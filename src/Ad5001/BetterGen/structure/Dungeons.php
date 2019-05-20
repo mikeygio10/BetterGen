@@ -25,11 +25,7 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 
 class Dungeons extends PopulatorObject {
-	public $overridable = [
-			Block::AIR => true,
-			17 => true,
-			Block::SNOW_LAYER => true,
-			Block::LOG2 => true 
+	public $overridable = [Block::AIR => true, 17 => true, Block::SNOW_LAYER => true, Block::LOG2 => true
 	];
 	/** @var int */
 	protected $height;
